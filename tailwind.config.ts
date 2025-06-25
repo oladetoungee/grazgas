@@ -58,6 +58,10 @@ const config: Config = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
+  			},
+  			grazgas: {
+  				dark: '#000618',
+  				blue: '#3B82F6',
   			}
   		}
   	}

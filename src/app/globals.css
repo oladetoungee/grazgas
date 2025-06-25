@@ -87,6 +87,17 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-[#FDFCFF] text-foreground;
   }
+  .dark body {
+    background: linear-gradient(
+      103.42deg,
+      #000309 15%,
+      rgba(1, 43, 90, 0.7) 45%,
+      rgba(1, 148, 254, 0.3) 68%,
+      rgba(4, 34, 107, 0.1) 88%
+    ) !important;
+  }
+  
+  
 }
