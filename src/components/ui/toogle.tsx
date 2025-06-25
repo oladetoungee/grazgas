@@ -17,12 +17,12 @@ export function ModeToggle() {
   return (
     <button
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className="fixed top-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-800 transition-all"
+      className=" p-2 rounded-full bg-gray-100 dark:bg-gray-800 transition-all"
     >
       {resolvedTheme === "dark" ? (
-        <Moon className="h-6 w-6 text-yellow-500" />
+        <Moon className="h-4 w-4 text-yellow-500" />
       ) : (
-        <Sun className="h-6 w-6 text-gray-900" />
+        <Sun className="h-4 w-4 text-gray-900" />
       )}
     </button>
   );
