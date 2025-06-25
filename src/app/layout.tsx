@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider"
-import { ModeToggle } from "@/components/ui/toogle"
 import Header from "@/components/features/shared/header";
 import Footer from "@/components/features/shared/footer";
 
