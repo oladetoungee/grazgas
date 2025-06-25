@@ -1,5 +1,5 @@
-import { HomePage } from "@/components/features/home";
+import GasPriceDashboard from "@/components/features/gas-price/gas-price-dashboard";
 
-export default function Home() {
-  return <HomePage />;
+export default function HomePage() {
+  return <GasPriceDashboard />;
 }
