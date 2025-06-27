@@ -33,8 +33,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-// Simulated data generation based on time range
-function generateGasFeeData(range: "1h" | "24h" | "7d") {
+import { Skeleton } from "@/components/ui/skeleton"
+import { GasPriceComponentProps } from "@/types/gas-price";
+
+//TODO: Add real data
+function generateGasFeeData(gasData: any, range: "1h" | "24h" | "7d") {
   const data: any[] = []
   const now = new Date()
 
@@ -49,15 +52,21 @@ function generateGasFeeData(range: "1h" | "24h" | "7d") {
     points = 14
   }
 
+  const baseFee = parseFloat(gasData?.estimatedBaseFee || "0")
+  const lowFee = parseFloat(gasData?.low?.suggestedMaxFeePerGas || "0")
+  const mediumFee = parseFloat(gasData?.medium?.suggestedMaxFeePerGas || "0")
+  const highFee = parseFloat(gasData?.high?.suggestedMaxFeePerGas || "0")
+
   for (let i = points - 1; i >= 0; i--) {
     const time = new Date(now.getTime() - i * interval * 60 * 1000)
-    const base = Math.random() * 100
+    // Add some variation to make the chart more realistic
+    const variation = 0.1 // 10% variation
     data.push({
       time: time.toISOString(),
-      baseFee: +(base + 10).toFixed(2),
-      baseFeeLow: +(base + Math.random() * 5).toFixed(2),
-      baseFeeMedium: +(base + Math.random() * 10).toFixed(2),
-      baseFeeHigh: +(base + Math.random() * 15).toFixed(2),
+      baseFee: +(baseFee * (1 + (Math.random() - 0.5) * variation)).toFixed(2),
+      baseFeeLow: +(lowFee * (1 + (Math.random() - 0.5) * variation)).toFixed(2),
+      baseFeeMedium: +(mediumFee * (1 + (Math.random() - 0.5) * variation)).toFixed(2),
+      baseFeeHigh: +(highFee * (1 + (Math.random() - 0.5) * variation)).toFixed(2),
     })
   }
 
@@ -65,19 +74,50 @@ function generateGasFeeData(range: "1h" | "24h" | "7d") {
 }
 
 const chartConfig = {
-  baseFee: { label: "Base Fee",  color: "#EF4444", }, 
+  baseFee: { label: "Base Fee", color: "#EF4444", },
   baseFeeLow: { label: "Low Fee", color: "#2EB88A" },
   baseFeeMedium: { label: "Medium Fee", color: "##fcba03" },
   baseFeeHigh: { label: "High Fee", color: "#AF57DB", },
 } satisfies ChartConfig
 
-export default function GasPriceTrendChart() {
+export default function GasPriceTrendChart({ gasData, loading }: GasPriceComponentProps) {
   const [timeRange, setTimeRange] = React.useState<"1h" | "24h" | "7d">("1h")
-  const [data, setData] = React.useState(() => generateGasFeeData("1h"))
+  const [data, setData] = React.useState<any[]>([])
 
   React.useEffect(() => {
-    setData(generateGasFeeData(timeRange))
-  }, [timeRange])
+    if (gasData) {
+      setData(generateGasFeeData(gasData, timeRange))
+    }
+  }, [timeRange, gasData])
+
+  if (loading) {
+    return (
+      <Card className="pt-0">
+        <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+          <div className="grid flex-1 gap-1">
+            <Skeleton className="h-6 w-48" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <Skeleton className="h-10 w-[160px]" />
+        </CardHeader>
+        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          <Skeleton className="h-[250px] w-full" />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!gasData) {
+    return (
+      <Card className="pt-0">
+        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          <div className="h-[250px] flex items-center justify-center text-gray-500">
+            No gas price data available
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className="pt-0">
@@ -168,9 +208,9 @@ export default function GasPriceTrendChart() {
               stroke="var(--color-baseFee)"
               stackId="a"
             />
-<ChartLegend>
-  <ChartLegendContent />
-</ChartLegend>
+            <ChartLegend>
+              <ChartLegendContent />
+            </ChartLegend>
 
           </AreaChart>
         </ChartContainer>
