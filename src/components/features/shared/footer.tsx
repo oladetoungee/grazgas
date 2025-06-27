@@ -14,11 +14,12 @@ export function Footer() {
           <a href="mailto:hello@grazgas.com" className="text-sm mb-4 hover:underline">hello@grazgas.com</a> 
       </div>
       <div className="flex flex-wrap justify-center gap-8 mb-6 mt-2 text-xs">
-        <Link href="#" className="hover:underline">Gas Network</Link>
-        <Link href="#" className="hover:underline">GitHub Repo</Link>
-        <Link href="#" className="hover:underline">API Sources</Link>
-        <Link href="#" className="hover:underline">Telegram Bot</Link>
-        <Link href="#" className="hover:underline">Discord</Link>
+        <Link href="/" className="hover:underline">Gas Network</Link>
+        <Link href="https://github.com/oladetoungee/grazgas" target="_blank" rel="noopener noreferrer" className="hover:underline">
+        GitHub Repo</Link>
+        <Link href="https://www.infura.io/" target="_blank" rel="noopener noreferrer" className="hover:underline">API Sources</Link>
+        <Link href="/telegram-bot" className="hover:underline">Telegram Bot</Link>
+        <Link href="https://discord.gg/Urj6n7Aj" target="_blank" rel="noopener noreferrer" className="hover:underline">Discord</Link>
       </div>
       <hr className="w-full max-w-2xl border-t border-gray-700 mb-4" />
       <div className="text-xs text-gray-400 text-center w-full">© 2025 GrazGas. All rights reserved.</div>
