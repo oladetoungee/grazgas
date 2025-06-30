@@ -34,21 +34,20 @@ import {
 } from "@/components/ui/select"
 
 import { Skeleton } from "@/components/ui/skeleton"
-import { GasPriceComponentProps } from "@/types/gas-price";
+import { GasPriceChartProps } from "@/types/gas-price";
 
-//TODO: Add real data
-function generateGasFeeData(gasData: any, range: "1h" | "24h" | "7d") {
+function generateSimulatedData(gasData: any, range: "1h" | "24h" | "7d") {
   const data: any[] = []
   const now = new Date()
 
-  let interval = 1 // minute
+  let interval = 1
   let points = 60
 
   if (range === "24h") {
-    interval = 30 // minutes
+    interval = 30
     points = 48
   } else if (range === "7d") {
-    interval = 720 // minutes = 12 hours
+    interval = 720
     points = 14
   }
 
@@ -59,8 +58,7 @@ function generateGasFeeData(gasData: any, range: "1h" | "24h" | "7d") {
 
   for (let i = points - 1; i >= 0; i--) {
     const time = new Date(now.getTime() - i * interval * 60 * 1000)
-    // Add some variation to make the chart more realistic
-    const variation = 0.1 // 10% variation
+    const variation = 0.1
     data.push({
       time: time.toISOString(),
       baseFee: +(baseFee * (1 + (Math.random() - 0.5) * variation)).toFixed(2),
@@ -73,22 +71,69 @@ function generateGasFeeData(gasData: any, range: "1h" | "24h" | "7d") {
   return data
 }
 
+function transformHistoricalData(historicalData: any[], range: "1h" | "24h" | "7d") {
+  if (!historicalData || historicalData.length === 0) return [];
+
+  return historicalData.map(item => ({
+    time: new Date(item.date).toISOString(),
+    baseFee: parseFloat(item.baseFee || "0"),
+    baseFeeLow: parseFloat(item.low || "0"),
+    baseFeeMedium: parseFloat(item.medium || "0"),
+    baseFeeHigh: parseFloat(item.high || "0"),
+  }));
+}
+
 const chartConfig = {
-  baseFee: { label: "Base Fee", color: "#EF4444", },
-  baseFeeLow: { label: "Low Fee", color: "#2EB88A" },
-  baseFeeMedium: { label: "Medium Fee", color: "##fcba03" },
-  baseFeeHigh: { label: "High Fee", color: "#AF57DB", },
+  baseFee: { label: "Base", color: "#EF4444", },
+  baseFeeLow: { label: "Low", color: "#2EB88A" },
+  baseFeeMedium: { label: "Medium", color: "#fcba03" },
+  baseFeeHigh: { label: "High", color: "#AF57DB", },
 } satisfies ChartConfig
 
-export default function GasPriceTrendChart({ gasData, loading }: GasPriceComponentProps) {
+export default function GasPriceTrendChart({ 
+  gasData, 
+  historicalData, 
+  loading, 
+  selectedChain, 
+  onRangeChange 
+}: GasPriceChartProps) {
   const [timeRange, setTimeRange] = React.useState<"1h" | "24h" | "7d">("1h")
   const [data, setData] = React.useState<any[]>([])
 
   React.useEffect(() => {
-    if (gasData) {
-      setData(generateGasFeeData(gasData, timeRange))
+    if (historicalData && historicalData.length > 0) {
+      setData(transformHistoricalData(historicalData, timeRange));
+    } else if (gasData) {
+      setData(generateSimulatedData(gasData, timeRange));
     }
-  }, [timeRange, gasData])
+  }, [timeRange, gasData, historicalData])
+
+  const handleRangeChange = (range: string) => {
+    const newRange = range as "1h" | "24h" | "7d";
+    setTimeRange(newRange);
+    onRangeChange(range);
+  };
+
+  const formatXAxisTick = (value: string) => {
+    const date = new Date(value)
+    
+    if (timeRange === "7d") {
+      return date.toLocaleDateString("en-US", {
+        weekday: "short"
+      })
+    } else if (timeRange === "24h") {
+      return date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        hour12: true
+      })
+    } else {
+      return date.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: true
+      })
+    }
+  }
 
   if (loading) {
     return (
@@ -107,7 +152,7 @@ export default function GasPriceTrendChart({ gasData, loading }: GasPriceCompone
     )
   }
 
-  if (!gasData) {
+  if (!gasData && !historicalData) {
     return (
       <Card className="pt-0">
         <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
@@ -124,9 +169,14 @@ export default function GasPriceTrendChart({ gasData, loading }: GasPriceCompone
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Gas Fee Area Chart</CardTitle>
-          <CardDescription>Base fee across different conditions</CardDescription>
+          <CardDescription>
+            {historicalData && historicalData.length > 0 
+              ? "Real historical data" 
+              : "Simulated data based on current prices"
+            }
+          </CardDescription>
         </div>
-        <Select value={timeRange} onValueChange={v => setTimeRange(v as "1h" | "24h" | "7d")}>
+        <Select value={timeRange} onValueChange={handleRangeChange}>
           <SelectTrigger
             className="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
             aria-label="Select time range"
@@ -158,12 +208,7 @@ export default function GasPriceTrendChart({ gasData, loading }: GasPriceCompone
               axisLine={false}
               tickMargin={8}
               minTickGap={24}
-              tickFormatter={(value) =>
-                new Date(value).toLocaleTimeString("en-US", {
-                  hour: "numeric",
-                  minute: "numeric",
-                })
-              }
+              tickFormatter={formatXAxisTick}
             />
             <ChartTooltip
               cursor={false}
