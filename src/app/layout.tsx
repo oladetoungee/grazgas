@@ -1,18 +1,19 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/ui/theme-provider"
-import Header from "@/components/features/shared/header";
-import Footer from "@/components/features/shared/footer";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { ThemeProvider } from '@/components/ui/theme-provider';
+import Header from '@/components/features/shared/header';
+import Footer from '@/components/features/shared/footer';
+import { usePathname } from 'next/navigation';
+import AppLayout from '@/components/layout/layout';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "GrazGas – Ethereum Gas Estimator & Fee Tracker",
+  title: 'GrazGas – Ethereum Gas Estimator & Fee Tracker',
   description:
-    "Built at Grazac Academy, GrazGas is a real-time Ethereum gas fee estimator and multi-network tracker with educational insights and embeddable widgets.",
+    'Built at Grazac Academy, GrazGas is a real-time Ethereum gas fee estimator and multi-network tracker with educational insights and embeddable widgets.',
 };
-
 
 export default function RootLayout({
   children,
@@ -28,10 +29,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-  
-          {children}
-          <Footer />
+          <AppLayout>{children}</AppLayout>
         </ThemeProvider>
       </body>
     </html>
