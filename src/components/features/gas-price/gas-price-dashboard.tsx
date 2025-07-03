@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { GasPriceData, HistoricalGasData } from "@/types/gas-price";
 import GasPriceHeader from "./live-price";
-import ContractInteraction from "./contract-emulator";
 import GasPriceTrendChart from "./price-chart";
-import GasPumpBanner from "./banner-pump";
 import EmbeddableWidget from "./widget";
 import TransactionCostsTable from "./table-transaction";
 
@@ -65,7 +63,7 @@ export default function GasPriceDashboard() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col gap-12 py-8">
+    <div className="w-full max-w-5xl mx-auto flex flex-col gap-12 py-8 mx-8">
       <GasPriceHeader 
         selectedChain={selectedChain}
         setSelectedChain={setSelectedChain}
@@ -75,7 +73,32 @@ export default function GasPriceDashboard() {
         formatGasPrice={formatGasPrice}
         calculateUSDValue={calculateUSDValue}
       />
-      <ContractInteraction />
+      
+      {/* Contract Emulator CTA */}
+      <div className="mx-8 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 rounded-xl p-6 border border-blue-200 dark:border-gray-600">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex-1">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Estimate Your Contract Gas Costs
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Input any smart contract address and ABI to get precise gas estimates for all functions. Perfect for developers and DeFi users.
+            </p>
+          </div>
+          <div className="flex-shrink-0">
+            <a
+              href="/contract-emulator"
+              className="inline-flex items-center px-6 py-3 bg-grazgas-blue text-white font-semibold rounded-lg hover:bg-grazgas-blue/80 transition-colors shadow-lg"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Try Contract Estimator
+            </a>
+          </div>
+        </div>
+      </div>
+      
       <GasPriceTrendChart 
         gasData={gasData}
         historicalData={historicalData}
@@ -83,7 +106,6 @@ export default function GasPriceDashboard() {
         selectedChain={selectedChain}
         onRangeChange={(range: string) => fetchHistoricalData(selectedChain, range)}
       />
-      <GasPumpBanner />
       <EmbeddableWidget 
         gasData={gasData}
         loading={loading}
