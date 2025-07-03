@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import Header from "@/components/features/shared/header";
 import Footer from "@/components/features/shared/footer";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,9 +30,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-  
-          {children}
+       
+            {children}
+   
           <Footer />
+          <ScrollToTop />
         </ThemeProvider>
       </body>
     </html>
