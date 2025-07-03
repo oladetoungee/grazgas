@@ -53,7 +53,7 @@ export default function TransactionCostsTable({ gasData, loading, formatGasPrice
   }
 
   return (
-    <section className="mb-8">
+    <section className="mb-8 mx-8">
       <h2 className="text-2xl font-bold mb-2">
         Transaction Costs 
         <span className="text-xs font-normal text-foreground ml-2">

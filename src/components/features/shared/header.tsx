@@ -20,6 +20,7 @@ export function Header() {
         <nav className="flex items-center gap-6 text-xs md:text-sm">
           <Link href="/" className={`${pathname === '/' ? 'text-grazgas-blue' : 'text-foreground'} hover:underline`}>Dashboard</Link>
           <Link href="/about" className={`${pathname === '/about' ? 'text-grazgas-blue' : 'text-foreground'} hover:underline`}>About</Link>
+          <Link href="/contract-emulator" className={`${pathname === '/contract-emulator' ? 'text-grazgas-blue' : 'text-foreground'} hover:underline`}>Contract Estimator</Link>
           <Link href="/learning" className={`${pathname === '/learning' ? 'text-grazgas-blue' : 'text-foreground'} hover:underline`}>Learning</Link>
         </nav>
         <div className="flex-shrink-0">
@@ -36,6 +37,7 @@ export function Header() {
       {menuOpen && (
         <div className="absolute top-16 right-4 z-50 bg-white dark:bg-grazgas-dark rounded shadow-lg flex flex-col items-start p-4 gap-4 sm:hidden min-w-[160px] text-xs md:text-sm">
           <Link href="/" className={`${pathname === '/' ? 'text-grazgas-blue' : 'text-foreground'} hover:underline w-full`} onClick={() => setMenuOpen(false)}>Dashboard</Link>
+          <Link href="/contract-emulator" className={`${pathname === '/contract-emulator' ? 'text-grazgas-blue' : 'text-foreground'} hover:underline w-full`} onClick={() => setMenuOpen(false)}>Contract Estimator</Link>
           <Link href="/about" className={`${pathname === '/about' ? 'text-grazgas-blue' : 'text-foreground'} hover:underline w-full`} onClick={() => setMenuOpen(false)}>About</Link>
           <Link href="/learning" className={`${pathname === '/learning' ? 'text-grazgas-blue' : 'text-foreground'} hover:underline w-full`} onClick={() => setMenuOpen(false)}>Learning</Link>
           <div className="mt-2">
