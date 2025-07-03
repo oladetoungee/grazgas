@@ -137,7 +137,7 @@ export default function GasPriceTrendChart({
 
   if (loading) {
     return (
-      <Card className="pt-0">
+      <Card className="pt-0 ">
         <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
           <div className="grid flex-1 gap-1">
             <Skeleton className="h-6 w-48" />
@@ -154,7 +154,7 @@ export default function GasPriceTrendChart({
 
   if (!gasData && !historicalData) {
     return (
-      <Card className="pt-0">
+      <Card className="pt-0 mx-8">
         <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
           <div className="h-[250px] flex items-center justify-center text-gray-500">
             No gas price data available
@@ -165,7 +165,7 @@ export default function GasPriceTrendChart({
   }
 
   return (
-    <Card className="pt-0">
+    <Card className="pt-0 mx-8">
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Gas Fee Area Chart</CardTitle>
