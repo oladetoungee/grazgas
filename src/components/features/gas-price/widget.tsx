@@ -25,7 +25,7 @@ export default function EmbeddableWidget({ gasData, loading, formatGasPrice, cal
   };
 
   return (
-    <section className="mb-8">
+    <section className="mb-8 mx-8">
       <h2 className="text-lg font-semibold mb-2">Embeddable Widget</h2>
       {loading ? (
         <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">

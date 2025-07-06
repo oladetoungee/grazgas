@@ -4,8 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import Header from '@/components/features/shared/header';
 import Footer from '@/components/features/shared/footer';
-import { usePathname } from 'next/navigation';
-import AppLayout from '@/components/layout/layout';
+import { ScrollToTop } from '@/components/ui/scroll-to-top';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,7 +28,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AppLayout>{children}</AppLayout>
+          <Header />
+
+          {children}
+
+          <Footer />
+          <ScrollToTop />
         </ThemeProvider>
       </body>
     </html>
