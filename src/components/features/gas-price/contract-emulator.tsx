@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { bestTimeToTransact } from "@/lib/contract-actions";
 import { processAbi, estimateGas } from "@/lib/contract-actions";
 import { FunctionFragment, GasEstimate } from "@/types/contract";
 import {
@@ -27,6 +28,10 @@ export default function ContractInteraction() {
   const [functionParams, setFunctionParams] = useState<Record<string, Record<string, string>>>({});
   const [estimatingFunctions, setEstimatingFunctions] = useState<Record<string, boolean>>({});
   const [selectedChain, setSelectedChain] = useState("ethereum");
+  // Best Time to Transact state
+  const [bestTime, setBestTime] = useState<string | null>(null);
+  const [isFetchingBestTime, setIsFetchingBestTime] = useState(false);
+  const [bestTimeError, setBestTimeError] = useState<string | null>(null);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => processAbi(contractAddress, abiInput, setCallableFunctions, setError, setIsLoading), 500);
@@ -34,6 +39,22 @@ export default function ContractInteraction() {
   }, [contractAddress, abiInput]);
 
 
+
+  // Fetch best time recommendation when inputs change
+  useEffect(() => {
+    if (!contractAddress.trim() || !abiInput.trim()) {
+      setBestTime(null);
+      return;
+    }
+    setIsFetchingBestTime(true);
+    setBestTimeError(null);
+    bestTimeToTransact(selectedChain)
+      .then(data => {
+        setBestTime(`${data.window} (avg ${data.avgGwei} gwei)`);
+      })
+      .catch(err => setBestTimeError(err instanceof Error ? err.message : String(err)))
+      .finally(() => setIsFetchingBestTime(false));
+  }, [contractAddress, abiInput, selectedChain]);
 
   // Initialize parameters for functions when they change
   useEffect(() => {
@@ -66,6 +87,8 @@ export default function ContractInteraction() {
   return (
     <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mx-8">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Smart Contract Analysis</h2>
+
+
 
       <div className="space-y-6">
         {/* Instructions */}
@@ -111,6 +134,23 @@ export default function ContractInteraction() {
         {/* Error or Loading States */}
         {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg"><p className="text-red-700 text-sm">{error}</p></div>}
         {isLoading && <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg"><p className="text-blue-700 text-sm">Processing ABI...</p></div>}
+
+
+      <div className="">
+        {/* Best Time to Transact Recommendation */}
+        {isFetchingBestTime && (
+          <p className="text-sm text-gray-600 dark:text-gray-300">Loading best time to transact...</p>
+        )}
+        {bestTimeError && (
+          <p className="text-sm bg-red-600 dark:text-red-300">Error: {bestTimeError}</p>
+        )}
+        {bestTime && (
+          <div className="mb-4 p-4  dark:bg-green-900/20 bg-green-200 text-green-800 dark:text-green-300 rounded">
+            <span className="font-semibold text-gray-900 dark:text-white">Best Time to Transact:</span> {bestTime}
+          </div>
+        )}
+      </div>
+
 
         {/* Functions Display */}
         {callableFunctions.length > 0 && (
@@ -167,11 +207,10 @@ export default function ContractInteraction() {
                             </span>
                           )}
                         </div>
-                        <span className={`px-2 py-1 text-xs rounded ${
-                          func.stateMutability === 'view' 
-                            ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300' 
-                            : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
-                        }`}>
+                        <span className={`px-2 py-1 text-xs rounded ${func.stateMutability === 'view'
+                          ? 'bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300'
+                          : 'bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300'
+                          }`}>
                           {func.stateMutability}
                           {func.payable && ' (payable)'}
                         </span>
@@ -196,7 +235,7 @@ export default function ContractInteraction() {
                         )}
                       </div>
 
-                                            {/* Parameters Input */}
+                      {/* Parameters Input */}
                       {(func.stateMutability === 'nonpayable' || func.stateMutability === 'payable') && (
                         <div className="space-y-3 mb-4">
                           {func.inputs.length > 0 ? (
