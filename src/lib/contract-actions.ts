@@ -64,7 +64,7 @@ const FALLBACK_GAS_PRICES = {
   optimism: "0.001"
 };
 
-const createProvider = async (chain: string): Promise<ethers.Provider> => {
+const createProvider = async (chain: string): Promise<ethers.JsonRpcProvider> => {
   const primaryEndpoint = RPC_ENDPOINTS[chain as keyof typeof RPC_ENDPOINTS];
   const fallbackEndpoint = FALLBACK_RPC_ENDPOINTS[chain as keyof typeof FALLBACK_RPC_ENDPOINTS];
   
@@ -180,7 +180,7 @@ export const bestTimeToTransact = async (
   if (blockCount > 1024) blockCount = 1024;
 
 // Use raw RPC to fetch fee history since provider.getFeeHistory may be unavailable
-  const feeHistory = await provider.send('eth_feeHistory', [blockCount, 'latest', []]) as {
+  const feeHistory = await (provider as ethers.JsonRpcProvider).send('eth_feeHistory', [blockCount, 'latest', []]) as {
     oldestBlock: string;
     baseFeePerGas: string[];
     gasUsedRatio: number[];
@@ -199,7 +199,10 @@ export const bestTimeToTransact = async (
   });
 
 const bestBlockNumber = BigInt(feeHistory.oldestBlock) + BigInt(minIdx + 1);
-  const block = await provider.getBlock(bestBlockNumber);
+const block = await provider.getBlock(bestBlockNumber);
+  if (!block) {
+    throw new Error(`Block ${bestBlockNumber.toString()} not found`);
+  }
   const date = new Date(block.timestamp * 1000);
   const window = date.toISOString().replace(/T/, ' ').replace(/\..+/, '') + ' UTC';
   const avgGwei = ethers.formatUnits(minFee, 'gwei');
