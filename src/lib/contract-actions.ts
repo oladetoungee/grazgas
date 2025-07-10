@@ -167,3 +167,42 @@ export const estimateGas = async (
     setIsEstimating(false);
   }
 };
+
+// Compute the best historical time to transact based on fee history
+export const bestTimeToTransact = async (
+  chain: string,
+  windowHours = 4
+): Promise<{ window: string; avgGwei: string }> => {
+  const provider = await createProvider(chain);
+  // Estimate blocks in the window (approximate 13s per block)
+  const blocksPerHour = Math.floor(3600 / 13);
+  let blockCount = windowHours * blocksPerHour;
+  if (blockCount > 1024) blockCount = 1024;
+
+// Use raw RPC to fetch fee history since provider.getFeeHistory may be unavailable
+  const feeHistory = await provider.send('eth_feeHistory', [blockCount, 'latest', []]) as {
+    oldestBlock: string;
+    baseFeePerGas: string[];
+    gasUsedRatio: number[];
+    reward: string[][];
+  };
+  // Convert hex strings to bigint and skip the first entry (oldestBlock)
+  const fees: bigint[] = feeHistory.baseFeePerGas.slice(1).map(f => BigInt(f));
+
+  let minFee = fees[0];
+  let minIdx = 0;
+  fees.forEach((fee, idx) => {
+    if (fee < minFee) {
+      minFee = fee;
+      minIdx = idx;
+    }
+  });
+
+const bestBlockNumber = BigInt(feeHistory.oldestBlock) + BigInt(minIdx + 1);
+  const block = await provider.getBlock(bestBlockNumber);
+  const date = new Date(block.timestamp * 1000);
+  const window = date.toISOString().replace(/T/, ' ').replace(/\..+/, '') + ' UTC';
+  const avgGwei = ethers.formatUnits(minFee, 'gwei');
+
+  return { window, avgGwei };
+};
