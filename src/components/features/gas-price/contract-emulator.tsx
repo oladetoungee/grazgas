@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { bestTimeToTransact } from "@/lib/contract-actions";
 import { processAbi, estimateGas } from "@/lib/contract-actions";
 import { FunctionFragment, GasEstimate } from "@/types/contract";
 import {
@@ -27,11 +26,7 @@ export default function ContractInteraction() {
   const [showGasDialog, setShowGasDialog] = useState(false);
   const [functionParams, setFunctionParams] = useState<Record<string, Record<string, string>>>({});
   const [estimatingFunctions, setEstimatingFunctions] = useState<Record<string, boolean>>({});
-const [selectedChain, setSelectedChain] = useState("ethereum");
-  // Best Time to Transact state
-  const [bestTime, setBestTime] = useState<string | null>(null);
-  const [isFetchingBestTime, setIsFetchingBestTime] = useState(false);
-  const [bestTimeError, setBestTimeError] = useState<string | null>(null);
+  const [selectedChain, setSelectedChain] = useState("ethereum");
 
   useEffect(() => {
     const timeoutId = setTimeout(() => processAbi(contractAddress, abiInput, setCallableFunctions, setError, setIsLoading), 500);
@@ -39,22 +34,6 @@ const [selectedChain, setSelectedChain] = useState("ethereum");
   }, [contractAddress, abiInput]);
 
 
-
-// Fetch best time recommendation when inputs change
-  useEffect(() => {
-    if (!contractAddress.trim() || !abiInput.trim()) {
-      setBestTime(null);
-      return;
-    }
-    setIsFetchingBestTime(true);
-    setBestTimeError(null);
-    bestTimeToTransact(selectedChain)
-      .then(data => {
-        setBestTime(`${data.window} (avg ${data.avgGwei} gwei)`);
-      })
-      .catch(err => setBestTimeError(err instanceof Error ? err.message : String(err)))
-      .finally(() => setIsFetchingBestTime(false));
-  }, [contractAddress, abiInput, selectedChain]);
 
   // Initialize parameters for functions when they change
   useEffect(() => {
@@ -86,20 +65,7 @@ const [selectedChain, setSelectedChain] = useState("ethereum");
 
   return (
     <section className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mx-8">
-<h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Smart Contract Analysis</h2>
-
-        {/* Best Time to Transact Recommendation */}
-        {isFetchingBestTime && (
-          <p className="text-sm text-gray-600 dark:text-gray-300">Loading best time to transact...</p>
-        )}
-        {bestTimeError && (
-          <p className="text-sm text-red-600 dark:text-red-300">Error: {bestTimeError}</p>
-        )}
-        {bestTime && (
-          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded">
-            <span className="font-semibold text-gray-900 dark:text-white">Best Time to Transact:</span> {bestTime}
-          </div>
-        )}
+      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Smart Contract Analysis</h2>
 
       <div className="space-y-6">
         {/* Instructions */}
